@@ -16,8 +16,8 @@ r = 0.5773502*DISTANCE_MIC     # r = l/sqrt(3)
 R = 0.8                         #    mt (Radius of Table)
 K1 = r*r + R*R
 K2 = 2*r*R
-DELAY_DIFF_THRESH = 0.001
-ERR_THRESH =  0.05                 # test
+DELAY_DIFF_THRESH = 0.01
+ERR_THRESH =  0.01                 # test
 D = 0
 SILENCE_THRESHOLD = 500
 
@@ -26,7 +26,7 @@ def movingaverage(interval, window_size):
     return np.convolve(interval, window, 'valid')
 
 def f1(phi):
-    y = -delayDiff12 + np.sqrt(K1 - K2*np.cos(2*np.pi/3 - phi)) - np.sqrt(K1 - K2*np.cos(phi))
+    y = -D + np.sqrt(K1 - K2*np.cos(2*np.pi/3 - phi)) - np.sqrt(K1 - K2*np.cos(phi))
     return y
 
 def f2(phi):
@@ -108,24 +108,18 @@ while(1):
             try:
                 if max_index == 0 and delayDiff12 > DELAY_DIFF_THRESH and avMax > SILENCE_THRESHOLD:
                     ser.write("G")
-                    theta1 = (opt.fsolve(f1, np.pi/2))
-                    theta2 = (opt.fsolve(f2, np.pi/2))
-                    theta3 = (opt.fsolve(f3, np.pi/2))
-                    print theta1, theta2, theta3
-                    theta = np.average([theta1, theta2, theta3])
+                    D = delayDiff12
+                    theta = (opt.fsolve(f1, np.pi/2))
                     print theta*180/np.pi
-                    ser.write(chr(int((theta*180/np.pi)/10)))      
+                    ser.write(chr(int((theta*180/np.pi+240)/10)))      
                     if print_index%10 == 0:
                         print "Closest to G ||", "%.3f,%.3f,%.3f"%(delayDiff12, delayDiff23, delayDiff31)
 
                 
                 elif max_index == 1 and delayDiff23 > DELAY_DIFF_THRESH and avMax > SILENCE_THRESHOLD:
                     ser.write("B")
-                    theta1 = (opt.fsolve(f1, np.pi/2))
-                    theta2 = (opt.fsolve(f2, np.pi/2))
-                    theta3 = (opt.fsolve(f3, np.pi/2))
-                    print theta1, theta2, theta3
-                    theta = np.average([theta1, theta2, theta3])
+                    D = delayDiff23
+                    theta = (opt.fsolve(f1, np.pi/2))
                     print theta*180/np.pi
                     if(theta < 0):
                         theta += np.pi*2
@@ -135,13 +129,10 @@ while(1):
 
                 elif max_index == 2 and delayDiff31 > DELAY_DIFF_THRESH and avMax > SILENCE_THRESHOLD:
                     ser.write("R")
-                    theta1 = (opt.fsolve(f1, np.pi/2))
-                    theta2 = (opt.fsolve(f2, np.pi/2))
-                    theta3 = (opt.fsolve(f3, np.pi/2))
-                    print theta1, theta2, theta3
-                    theta = np.average([theta1, theta2, theta3])
+                    D = delayDiff31
+                    theta = (opt.fsolve(f1, np.pi/2))
                     print theta*180/np.pi
-                    ser.write(chr(int((theta*180/np.pi)/10)))      
+                    ser.write(chr(int((theta*180/np.pi+120)/10)))      
                     if print_index%10 == 0:
                         print "Closest to R ||", "%.3f,%.3f,%.3f"%(delayDiff12, delayDiff23, delayDiff31)
 
