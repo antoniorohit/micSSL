@@ -16,6 +16,7 @@ r = 0.5773502*DISTANCE_MIC     # r = l/sqrt(3)
 R = 0.8                         #    mt (Radius of Table)
 K1 = r*r + R*R
 K2 = 2*r*R
+DELAY_DIFF_THRESH = 0.1
 ERR_THRESH =  0.05                 # test
 sign = 1
 D = 0
@@ -104,53 +105,36 @@ while(1):
         while(ser.readline().strip()!="Go"):
             print_index+=1;
             try:
-                if max_index == 0 and delayDiff12 > 0.05:
+                if max_index == 0 and delayDiff12 > DELAY_DIFF_THRESH:
                     ser.write("G")
-                    D = delayDiff12
-                    theta = opt.newton(f, 0)
-                    ser.write(chr(int((theta*180/math.pi + 0)/20)))      
-                    angle12 =  math.acos(delayDiff12/DISTANCE_MIC)*180/math.pi
-                    angle23 =  math.acos(delayDiff23/DISTANCE_MIC)*180/math.pi
-                    angle31 =  math.acos(delayDiff31/DISTANCE_MIC)*180/math.pi
-
+#                     D = delayDiff12
+#                     theta = opt.newton(f, 0, tol=1.48e-03)
+#                     ser.write(chr(int((theta*180/math.pi + 0)/20)))      
                     if print_index%10 == 0:
                         print "Closest to G ||", "%.3f,%.3f,%.3f"%(delayDiff12, delayDiff23, delayDiff31)
-                        print "Angle 12: %d"%angle12
-                        print "Angle 23: %d"%angle23
-                        print "Angle 31: %d"%angle31
+
                 
-                elif max_index == 1 and delayDiff23 > 0.05:
+                elif max_index == 1 and delayDiff23 > DELAY_DIFF_THRESH:
                     ser.write("B")
-                    D = delayDiff12
-                    theta = opt.newton(f, 0)
-                    ser.write(chr(int((theta*180/math.pi + 120)/20)))      
-                    angle12 =  math.acos(delayDiff12/DISTANCE_MIC)*180/math.pi
-                    angle23 =  math.acos(delayDiff23/DISTANCE_MIC)*180/math.pi
-                    angle31 =  math.acos(delayDiff31/DISTANCE_MIC)*180/math.pi
+#                     D = delayDiff23
+#                     theta = opt.newton(f, 0, tol=1.48e-03)
+#                     ser.write(chr(int((theta*180/math.pi + 120)/20)))      
                     if print_index%10 == 0:
                         print "Closest to B ||", "%.3f,%.3f,%.3f"%(delayDiff12, delayDiff23, delayDiff31)
-                        print "Angle 12: %d"%angle12
-                        print "Angle 23: %d"%angle23
-                        print "Angle 31: %d"%angle31
 
-                elif max_index == 2 and delayDiff31 > 0.05:
+                elif max_index == 2 and delayDiff31 > DELAY_DIFF_THRESH:
                     ser.write("R")
-                    D = delayDiff12
-                    theta = opt.newton(f, 0)
-                    ser.write(chr(int((theta*180/math.pi + 240)/20)))      
-                    angle12 =  math.acos(delayDiff12/DISTANCE_MIC)*180/math.pi
-                    angle23 =  math.acos(delayDiff23/DISTANCE_MIC)*180/math.pi
-                    angle31 =  math.acos(delayDiff31/DISTANCE_MIC)*180/math.pi
+#                     D = delayDiff31
+#                     theta = opt.newton(f, 0, tol=1.48e-03)
+#                     ser.write(chr(int((theta*180/math.pi + 240)/20)))      
                     if print_index%10 == 0:
                         print "Closest to R ||", "%.3f,%.3f,%.3f"%(delayDiff12, delayDiff23, delayDiff31)
-                        print "Angle 12: %d"%angle12
-                        print "Angle 23: %d"%angle23
-                        print "Angle 31: %d"%angle31
                 ser.write('Y')
             
-            except ValueError:
+            except ValueError or RuntimeError or OverflowError:
                 if print_index%10 == 0:
                     print "%.3f,%.3f,%.3f"%(delayDiff12, delayDiff23, delayDiff31)
+#                     print theta
                 ser.write('Y')
 
         ser.flushInput()  
