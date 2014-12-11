@@ -20,6 +20,9 @@ DELAY_DIFF_THRESH = 0.01
 ERR_THRESH =  0.01                 # test
 D = 0
 SILENCE_THRESHOLD = 500
+NUM_LEDS = 32
+DIVISOR = 360/NUM_LEDS
+
 
 def movingaverage(interval, window_size):
     window = np.ones(int(window_size))/float(window_size)
@@ -109,9 +112,14 @@ while(1):
                 if max_index == 0 and delayDiff12 > DELAY_DIFF_THRESH and avMax > SILENCE_THRESHOLD:
                     ser.write("G")
                     D = delayDiff12
-                    theta = (opt.fsolve(f1, np.pi/2))
+                    theta = (opt.fsolve(f1, 0))
+                    theta1 = (opt.fsolve(f1, 0))
+                    theta2 = (opt.fsolve(f1, np.pi/2))
+                    theta3 = (opt.fsolve(f1, np.pi))
+#                     print theta1*180/np.pi, theta2*180/np.pi, theta3*180/np.pi
+#                     theta = theta1
                     print theta*180/np.pi
-                    ser.write(chr(int((theta*180/np.pi+240)/10)))      
+                    ser.write(chr(int((-theta*180/np.pi+360)/DIVISOR)))      
                     if print_index%10 == 0:
                         print "Closest to G ||", "%.3f,%.3f,%.3f"%(delayDiff12, delayDiff23, delayDiff31)
 
@@ -119,20 +127,30 @@ while(1):
                 elif max_index == 1 and delayDiff23 > DELAY_DIFF_THRESH and avMax > SILENCE_THRESHOLD:
                     ser.write("B")
                     D = delayDiff23
-                    theta = (opt.fsolve(f1, np.pi/2))
+                    theta = (opt.fsolve(f1, 0))
+                    theta1 = (opt.fsolve(f1, 0))
+                    theta2 = (opt.fsolve(f1, np.pi/2))
+                    theta3 = (opt.fsolve(f1, np.pi))
+#                     print theta1*180/np.pi, theta2*180/np.pi, theta3*180/np.pi
+#                     theta = theta1
                     print theta*180/np.pi
                     if(theta < 0):
                         theta += np.pi*2
-                    ser.write(chr(int((theta*180/np.pi + 0)/10)))      
+                    ser.write(chr(int((-theta*180/np.pi + 120)/DIVISOR)))      
                     if print_index%10 == 0:
                         print "Closest to B ||", "%.3f,%.3f,%.3f"%(delayDiff12, delayDiff23, delayDiff31)
 
                 elif max_index == 2 and delayDiff31 > DELAY_DIFF_THRESH and avMax > SILENCE_THRESHOLD:
                     ser.write("R")
                     D = delayDiff31
-                    theta = (opt.fsolve(f1, np.pi/2))
+                    theta = (opt.fsolve(f1, 0))
+                    theta1 = (opt.fsolve(f1, 0))
+                    theta2 = (opt.fsolve(f1, np.pi/2))
+                    theta3 = (opt.fsolve(f1, np.pi))
+#                     print theta1*180/np.pi, theta2*180/np.pi, theta3*180/np.pi
+#                     theta = theta1
                     print theta*180/np.pi
-                    ser.write(chr(int((theta*180/np.pi+120)/10)))      
+                    ser.write(chr(int((-theta*180/np.pi+240)/DIVISOR)))      
                     if print_index%10 == 0:
                         print "Closest to R ||", "%.3f,%.3f,%.3f"%(delayDiff12, delayDiff23, delayDiff31)
 
